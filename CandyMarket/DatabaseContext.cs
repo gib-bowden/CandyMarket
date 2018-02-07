@@ -7,12 +7,13 @@ namespace CandyMarket
 {
     internal class DatabaseContext
     {
-        private int _countOfTaffy;
-        private int _countOfCandyCoated;
-        private int _countOfChocolateBar;
-        private int _countOfZagnut;
+        Dictionary<string, int> _taffy = new Dictionary<string, int>();
+        Dictionary<string, int> _candyCoated = new Dictionary<string, int>();
+        Dictionary<string, int> _compressedSugar = new Dictionary<string, int>();
+        Dictionary<string, int> _zagnut = new Dictionary<string, int>();
 
         public Dictionary<string, int> CandyCounts = new Dictionary<string, int>();
+
 
         /**
          * this is just an example.
@@ -31,187 +32,191 @@ namespace CandyMarket
                 .ToList();
         }
 
-        internal void SaveNewCandy(char selectedCandyMenuOption)
+        internal void SaveNewCandy(CandyType candyType, int howMany, string userName)
         {
-            var candyOption = int.Parse(selectedCandyMenuOption.ToString());
-
-            var maybeCandyMaybeNot = (CandyType)selectedCandyMenuOption;
-            var forRealTheCandyThisTime = (CandyType)candyOption;
-
-            switch (forRealTheCandyThisTime)
+            if (!_taffy.ContainsKey(userName))
+            {
+                _taffy.Add(userName, 0);
+                _candyCoated.Add(userName, 0);
+                _compressedSugar.Add(userName, 0);
+                _zagnut.Add(userName, 0);
+            }
+            switch (candyType)
             {
                 case CandyType.TaffyNotLaffy:
-                    ++_countOfTaffy;
+                    _taffy[userName] += howMany;
                     break;
                 case CandyType.CandyCoated:
-                    ++_countOfCandyCoated;
+                    _candyCoated[userName] += howMany;
                     break;
                 case CandyType.CompressedSugar:
-                    ++_countOfChocolateBar;
+                    _compressedSugar[userName] += howMany;
                     break;
                 case CandyType.ZagnutStyle:
-                    ++_countOfZagnut;
+                    _zagnut[userName] += howMany;
                     break;
                 default:
                     break;
             }
         }
 
-        internal void EatCandy(char selectedCandyMenuOption)
+        internal bool RemoveCandy(CandyType type, string name)
         {
-            var candyOption = int.Parse(selectedCandyMenuOption.ToString());
-
-            var eatenCandy = (CandyType)candyOption;
-
-            switch (eatenCandy)
+            switch (type)
             {
                 case CandyType.TaffyNotLaffy:
-                    if (_countOfTaffy > 0)
+                    if (_taffy[name] > 0)
                     {
-                        --_countOfTaffy;
-                    }                    
-                    break;
+                        _taffy[name]--;
+                        return true; 
+                    }
+                    return false; 
                 case CandyType.CandyCoated:
-                    if (_countOfCandyCoated > 0)
+                    if (_candyCoated[name] > 0)
                     {
-                        --_countOfCandyCoated;
-                    }                    
-                    break;
+                        _candyCoated[name]--;
+                        return true;
+                    }
+                    return false;
                 case CandyType.CompressedSugar:
-                    if (_countOfChocolateBar > 0)
+                    if (_compressedSugar[name] > 0)
                     {
-                        --_countOfChocolateBar;
-                    }                    
-                    break;
+                        _compressedSugar[name]--;
+                        return true;
+                    }
+                    return false;
                 case CandyType.ZagnutStyle:
-                    if (_countOfZagnut > 0)
+                    if (_zagnut[name] > 0)
                     {
-                        --_countOfZagnut;
-                    }                    
-                    break;
+                        _zagnut[name]--;
+                        return true;
+                    }
+                    return false; 
                 default:
-                    break;
+                    return false;
             }
         }
 
 
-        internal void TossCandy(char selectedCandyMenuOption)
-        {
-            var candyOption = int.Parse(selectedCandyMenuOption.ToString());
-
-            var eatenCandy = (CandyType)candyOption;
-
-            switch (eatenCandy)
-            {
-                case CandyType.TaffyNotLaffy:
-                    if (_countOfTaffy > 0)
-                    {
-                        _countOfTaffy = 0;
-                    }
-                    break;
-                case CandyType.CandyCoated:
-                    if (_countOfCandyCoated > 0)
-                    {
-                        _countOfCandyCoated = 0;
-                    }
-                    break;
-                case CandyType.CompressedSugar:
-                    if (_countOfChocolateBar > 0)
-                    {
-                        _countOfChocolateBar = 0;
-                    }
-                    break;
-                case CandyType.ZagnutStyle:
-                    if (_countOfZagnut > 0)
-                    {
-                        _countOfZagnut = 0;
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
 
 
-        internal void GiveCandy(char selectedCandyMenuOption)
-        {
-            var candyOption = int.Parse(selectedCandyMenuOption.ToString());
-            var eatenCandy = (CandyType)candyOption;
-            int amount; 
+        //internal void TossCandy(char selectedCandyMenuOption)
+        //{
+        //    var candyOption = int.Parse(selectedCandyMenuOption.ToString());
 
-                switch (eatenCandy)
-                {
-                    case CandyType.TaffyNotLaffy:
-                    if (_countOfTaffy > 0)
-                    {
-                        amount = GiveAwayAmount(); 
-                        if (amount > 0)
-                        {
-                            var count = _countOfTaffy - amount;
-                            _countOfTaffy = (count < 0) ? 0 : count;
-                        }
-                    }
-                        break;
-                    case CandyType.CandyCoated:
-                    if (_countOfCandyCoated > 0)
-                    {
-                        amount = GiveAwayAmount();
-                        if (amount > 0)
-                        {
-                            var count = _countOfCandyCoated - amount;
-                            _countOfCandyCoated = (count < 0) ? 0 : count;
-                        }
-                    }
-                        break;
-                    case CandyType.CompressedSugar:
-                        if (_countOfChocolateBar > 0)
-                        {
-                        amount = GiveAwayAmount();
-                        if (amount > 0)
-                        {
-                            var count = _countOfChocolateBar - amount;
-                            _countOfChocolateBar = (count < 0) ? 0 : count;
-                        }
+        //    var eatenCandy = (CandyType)candyOption;
 
-                        }
-                        break;
-                    case CandyType.ZagnutStyle:
-                        if (_countOfZagnut > 0)
-                        {
-                        amount = GiveAwayAmount();
-                        if (amount > 0)
-                        {
-                            var count = _countOfZagnut - amount;
-                            _countOfZagnut = (count < 0) ? 0 : count;
-                        }
-
-                        }
-                        break;
-                    default:
-                        break;
-            }
+        //    switch (eatenCandy)
+        //    {
+        //        case CandyType.TaffyNotLaffy:
+        //            if (_countOfTaffy > 0)
+        //            {
+        //                _countOfTaffy = 0;
+        //            }
+        //            break;
+        //        case CandyType.CandyCoated:
+        //            if (_countOfCandyCoated > 0)
+        //            {
+        //                _countOfCandyCoated = 0;
+        //            }
+        //            break;
+        //        case CandyType.CompressedSugar:
+        //            if (_countOfChocolateBar > 0)
+        //            {
+        //                _countOfChocolateBar = 0;
+        //            }
+        //            break;
+        //        case CandyType.ZagnutStyle:
+        //            if (_countOfZagnut > 0)
+        //            {
+        //                _countOfZagnut = 0;
+        //            }
+        //            break;
+        //        default:
+        //            break;
+        //    }
+        //}
 
 
-        }
+        //internal void GiveCandy(char selectedCandyMenuOption)
+        //{
+        //    var candyOption = int.Parse(selectedCandyMenuOption.ToString());
+        //    var eatenCandy = (CandyType)candyOption;
+        //    int amount; 
 
-        internal Dictionary<string, int> GetCandyCounts()
-        {
-            CandyCounts.Clear();
-            CandyCounts.Add("TaffyNotLaffy", _countOfTaffy);
-            CandyCounts.Add("CandyCoated", _countOfCandyCoated);
-            CandyCounts.Add("CompressedSugar", _countOfChocolateBar);
-            CandyCounts.Add("ZagnutStyle", _countOfZagnut);
+        //        switch (eatenCandy)
+        //        {
+        //            case CandyType.TaffyNotLaffy:
+        //            if (_countOfTaffy > 0)
+        //            {
+        //                amount = GiveAwayAmount(); 
+        //                if (amount > 0)
+        //                {
+        //                    var count = _countOfTaffy - amount;
+        //                    _countOfTaffy = (count < 0) ? 0 : count;
+        //                }
+        //            }
+        //                break;
+        //            case CandyType.CandyCoated:
+        //            if (_countOfCandyCoated > 0)
+        //            {
+        //                amount = GiveAwayAmount();
+        //                if (amount > 0)
+        //                {
+        //                    var count = _countOfCandyCoated - amount;
+        //                    _countOfCandyCoated = (count < 0) ? 0 : count;
+        //                }
+        //            }
+        //                break;
+        //            case CandyType.CompressedSugar:
+        //                if (_countOfChocolateBar > 0)
+        //                {
+        //                amount = GiveAwayAmount();
+        //                if (amount > 0)
+        //                {
+        //                    var count = _countOfChocolateBar - amount;
+        //                    _countOfChocolateBar = (count < 0) ? 0 : count;
+        //                }
 
-            return CandyCounts;
-        }
+        //                }
+        //                break;
+        //            case CandyType.ZagnutStyle:
+        //                if (_countOfZagnut > 0)
+        //                {
+        //                amount = GiveAwayAmount();
+        //                if (amount > 0)
+        //                {
+        //                    var count = _countOfZagnut - amount;
+        //                    _countOfZagnut = (count < 0) ? 0 : count;
+        //                }
 
-        internal int GiveAwayAmount()
-        {
-            Console.WriteLine();
-            Console.WriteLine("How much do you want to give away?");
-            var giveAway = Console.ReadLine();
-            var amount = int.Parse(giveAway.ToString());
-            return amount; 
-        }
+        //                }
+        //                break;
+        //            default:
+        //                break;
+        //    }
+
+
+        //}
+
+        //internal Dictionary<string, int> GetCandyCounts()
+        //{
+        //    CandyCounts.Clear();
+        //    CandyCounts.Add("TaffyNotLaffy", _countOfTaffy);
+        //    CandyCounts.Add("CandyCoated", _countOfCandyCoated);
+        //    CandyCounts.Add("CompressedSugar", _countOfChocolateBar);
+        //    CandyCounts.Add("ZagnutStyle", _countOfZagnut);
+
+        //    return CandyCounts;
+        //}
+
+        //internal int GiveAwayAmount()
+        //{
+        //    Console.WriteLine();
+        //    Console.WriteLine("How much do you want to give away?");
+        //    var giveAway = Console.ReadLine();
+        //    var amount = int.Parse(giveAway.ToString());
+        //    return amount; 
+        //}
     }
 }
